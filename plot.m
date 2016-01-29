@@ -44,7 +44,7 @@ If[Length[$ScriptCommandLine]==0,
 	(* AppendTo[args,"legend={Personal,Work}"]; *)
 	(* AppendTo[args,NotebookDirectory[]<>"test/address.csv"]; *)
 ,
-	Nothing
+	Nothing;
 ]
 
 
@@ -52,7 +52,7 @@ If[Length[args]==1,
 	Print["USAGE: plot file1 [file2...] [colour={colour1,colour2...}] [legend={title1,title2...}"]
 	Exit[]
 ,
-	Nothing
+	Nothing;
 ]
 
 (* Parse command line *)
@@ -64,9 +64,9 @@ Print["Command Line Parsed"]
 (* Change Default plot colour to Blue *)
 (* If Colour is not pecified Mathematica defaults to an ugly orange colour *)
 If[Length[clist]==0,
-	clist={Blue}
+	clist={Blue};
 ,
-	Nothing
+	Nothing;
 ]
 
 
@@ -92,18 +92,18 @@ If[MemberQ[tblInput,$Failed],
 
 
 
-(* Validate that data contains coordinates inthe 6th and 7th columns *)
+(* (* Validate that data contains coordinates inthe 6th and 7th columns *)
 ContainsAny[NumberQ
 	(* Filter out any addresses not located *)
-	Select[tmp,NumberQ[#[[6]]]&]
+	Select[tmp,NumberQ[#\[LeftDoubleBracket]6\[RightDoubleBracket]]&]
 ]
 
 
-Print["Address lookup from Google Complete"]
+Print["Address lookup from Google Complete"] *)
 
 
 (* Convert the full nested list into a list of Goegraphic Coordinates only *) 
-geoPos = Map[GeoPosition[#[[{6,7}]]]&, tblLoc, {2}];
+geoPos = Map[GeoPosition[#[[{6,7}]]]&, tblInput, {2}];
 Print["Coordinates converted to positions"]
 
 
