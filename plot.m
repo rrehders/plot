@@ -38,7 +38,7 @@ args = $ScriptCommandLine;
 If[Length[$ScriptCommandLine]==0,
 	args={"plotaddress"};
 	(* Set up a debug Command Line *)
-	(* AppendTo[args,NotebookDirectory[]<>"test/address1.csv"]; *)
+	AppendTo[args,NotebookDirectory[]<>"test/address1.csv"];
 	(* AppendTo[args,NotebookDirectory[]<>"test/address2.csv"]; *)
 	(* AppendTo[args,"colour={Blue,Green}"]; *)
 	(* AppendTo[args,"legend={Personal,Work}"]; *)
@@ -83,23 +83,44 @@ Switch[FileExtension[ifile],
 tblInput = readaddr /@ flist;
 
 
+(* Validate input files *)
+(* 1 - Files specified on the command line were read correctly *)
 If[MemberQ[tblInput,$Failed],
 	Print["One or more files specified do not exist"];
 	Exit[1]
 ,
-	Print["Input files Read"]
+	Print["Input files Read"];
 ]
 
-
-
-(* (* Validate that data contains coordinates inthe 6th and 7th columns *)
-ContainsAny[NumberQ
-	(* Filter out any addresses not located *)
-	Select[tmp,NumberQ[#\[LeftDoubleBracket]6\[RightDoubleBracket]]&]
+(* 2 - Records in files all contain 7 columns *)
+If[AllTrue[tblInput, Length[#]==7&, 2],
+	Print["All Records are 7 columns wide"];
+,
+	Print["Some records are too small (<7 columns)"];
+	Exit[1]
 ]
 
+(* 3 - Records contain coordinates that are real numbers *)
+If[AllTrue[Flatten[tblInput[[All,All,{6,7}]]],MatchQ[#,_Real]&],
+	Print["All values in Columns 6 and 7 are real numbers"];
+,
+	Print["Some values in the coordinate fields are not Real numbers"];
+	Exit[1]
+]
 
-Print["Address lookup from Google Complete"] *)
+(* 4 - The coordinates are in the correct range *)
+If[AllTrue[Flatten[tblInput[[All,All,6]]], -90<=#<=90 &],
+	Print["All Lattitudes are of the correct magnitude"];
+,
+	Print["some Lattitudes are of an incorrect magnitude"];
+	Exit[1]
+]
+If[AllTrue[Flatten[tblInput[[All,All,7]]], -180<=#<=180 &],
+	Print["All Longitudes are of the correct magnitude"];
+,
+	Print["some Longitudes are of an incorrect magnitude"];
+	Exit[1]
+]
 
 
 (* Convert the full nested list into a list of Goegraphic Coordinates only *) 
